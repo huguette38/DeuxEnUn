@@ -1,0 +1,14 @@
+{
+  "background_color": "#000000",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "Deux En Un",
+  "orientation": "portrait",
+  "scope": "/DeuxEnUn",
+  "short_name": "DeuxEnUn",
+  "start_url": "/DeuxEnUn",
+  "theme_color": "#74045c",
+  "id": "/DeuxEnUn/",
+  "description": "Notre application de couple",
+  "lang": "fr"
+}
