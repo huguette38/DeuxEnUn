@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>DeuxEnUn 🌸</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+  
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Mali:wght@500;700&display=swap');
+    body { font-family: 'Fredoka', sans-serif; background-color: #FFF5F7; color: #5A4A42; }
+    .nav-btn.active { background-color: #FFB7B2; color: white; transform: scale(1.05); }
+    .card-soft { background: #FFFFFF; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); border: 2px solid #FFE5E5; }
+  </style>
+</head>
+<body class="pb-10 pt-2 max-w-md mx-auto min-h-screen relative bg-pink-50/30">
+
+  <!-- EN-TÊTE & NAVIGATION EN HAUT -->
+  <header class="p-3 text-center bg-white rounded-b-3xl shadow-sm border-b border-pink-100 mb-3 sticky top-0 z-50">
+    <div class="flex justify-between items-center mb-2 px-2">
+      <div onclick="openAvatarModal(1)" class="cursor-pointer flex flex-col items-center">
+        <div id="avatar1-img" class="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center text-lg border-2 border-pink-300">🐱</div>
+        <span id="p1-name" class="text-[9px] font-bold mt-0.5 text-pink-600">Partenaire 1</span>
+      </div>
+
+      <div>
+        <h1 class="text-lg font-bold text-pink-500">DeuxEnUn 💖</h1>
+        <div class="text-[9px] bg-pink-100 text-pink-700 px-2 py-0.5 rounded-full font-semibold">Ensemble depuis -- jours</div>
+      </div>
+
+      <div onclick="openAvatarModal(2)" class="cursor-pointer flex flex-col items-center">
+        <div id="avatar2-img" class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-lg border-2 border-purple-300">🐰</div>
+        <span id="p2-name" class="text-[9px] font-bold mt-0.5 text-purple-600">Partenaire 2</span>
+      </div>
+    </div>
+
+    <!-- NAVIGATION HAUTE CLIQUABLE -->
+    <nav class="bg-pink-50 border border-pink-100 flex justify-around p-1.5 rounded-2xl">
+      <button onclick="switchTab('tasks')" id="tab-tasks" class="nav-btn active flex flex-col items-center px-2 py-1 rounded-xl text-[10px] font-bold">🧹 Tâches</button>
+      <button onclick="switchTab('budget')" id="tab-budget" class="nav-btn flex flex-col items-center px-2 py-1 rounded-xl text-[10px] font-bold">💰 Budget</button>
+      <button onclick="switchTab('agenda')" id="tab-agenda" class="nav-btn flex flex-col items-center px-2 py-1 rounded-xl text-[10px] font-bold">📅 Agenda</button>
+      <button onclick="switchTab('wheel')" id="tab-wheel" class="nav-btn flex flex-col items-center px-2 py-1 rounded-xl text-[10px] font-bold">🎡 Décision</button>
+      <button onclick="switchTab('planning')" id="tab-planning" class="nav-btn flex flex-col items-center px-2 py-1 rounded-xl text-[10px] font-bold">🍽️ Menus</button>
+    </nav>
+  </header>
+
+  <!-- CONTENU PRINCIPAL -->
+  <main class="px-4 space-y-4">
+
+    <!-- 1. TÂCHES -->
+    <section id="sec-tasks" class="tab-content space-y-3">
+      <div class="card-soft p-4">
+        <h2 class="text-sm font-bold text-pink-500 mb-2">🧹 Tâches du Cocon</h2>
+        <div class="space-y-2 mb-3">
+          <input type="text" id="task-input" placeholder="Nouvelle tâche..." class="w-full text-xs p-2 rounded-lg border border-pink-200">
+          <button onclick="addTask()" class="w-full bg-pink-400 text-white py-2 text-xs font-bold rounded-lg">Ajouter</button>
+        </div>
+        <ul id="task-list" class="space-y-2 max-h-48 overflow-y-auto"></ul>
+      </div>
+    </section>
+
+    <!-- 2. BUDGET -->
+    <section id="sec-budget" class="tab-content hidden space-y-3">
+      <div class="card-soft p-4">
+        <h2 class="text-sm font-bold text-emerald-500 mb-2">💰 Dépenses Communes</h2>
+        <div id="budget-summary" class="bg-emerald-50 p-2 rounded-xl mb-3 text-xs text-emerald-800 font-bold text-center">Équilibre...</div>
+        <div class="space-y-2 mb-3">
+          <input type="text" id="expense-title" placeholder="Objet" class="w-full text-xs p-2 rounded-lg border border-emerald-200">
+          <input type="number" id="expense-amount" placeholder="Montant (€)" class="w-full text-xs p-2 rounded-lg border border-emerald-200">
+          <button onclick="addExpense()" class="w-full bg-emerald-400 text-white py-2 text-xs font-bold rounded-lg">Ajouter</button>
+        </div>
+        <ul id="expense-list" class="space-y-2 max-h-40 overflow-y-auto"></ul>
+      </div>
+    </section>
+
+    <!-- 3. AGENDA -->
+    <section id="sec-agenda" class="tab-content hidden space-y-3">
+      <div class="card-soft p-4">
+        <h2 class="text-sm font-bold text-indigo-500 mb-2">📅 Agenda</h2>
+        <input type="text" id="agenda-title" placeholder="Événement..." class="w-full text-xs p-2 rounded-lg border border-indigo-200 mb-2">
+        <button onclick="addAgenda()" class="w-full bg-indigo-400 text-white py-2 text-xs font-bold rounded-lg">Ajouter</button>
+        <ul id="agenda-list" class="space-y-2 max-h-40 overflow-y-auto mt-2"></ul>
+      </div>
+    </section>
+
+    <!-- 4. ROUE -->
+    <section id="sec-wheel" class="tab-content hidden space-y-3">
+      <div class="card-soft p-4 text-center">
+        <h2 class="text-sm font-bold text-amber-500 mb-2">🎡 Décision</h2>
+        <div id="wheel-result" class="text-base font-bold text-pink-600 bg-amber-50 p-3 rounded-xl mb-3 border border-amber-200">Appuyez !</div>
+        <button onclick="spinWheel()" class="bg-amber-400 text-white px-5 py-2 rounded-xl font-bold text-xs">Tirer au sort 🎲</button>
+      </div>
+    </section>
+
+    <!-- 5. MENUS -->
+    <section id="sec-planning" class="tab-content hidden space-y-3">
+      <div class="card-soft p-4">
+        <h2 class="text-sm font-bold text-purple-500 mb-2">🍽️ Menus</h2>
+        <p class="text-xs text-gray-500">Bientôt disponible...</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL -->
+  <div id="avatar-modal" class="fixed inset-0 bg-black/40 hidden items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-3xl p-4 w-full max-w-xs space-y-2 text-center">
+      <h3 class="font-bold text-pink-500 text-sm">Modifier le profil</h3>
+      <input type="text" id="modal-name" placeholder="Prénom" class="w-full text-center p-2 rounded-lg border border-pink-200 text-xs">
+      <button onclick="saveAvatar()" class="w-full bg-pink-400 text-white font-bold py-2 rounded-xl text-xs">OK</button>
+    </div>
+  </div>
+
+  <script>
+    const db = firebase.database(firebase.initializeApp({ databaseURL: "https://notrecocon-default-rtdb.firebaseio.com/" }));
+    let state = { p1: {name:'Partenaire 1', emoji:'🐱'}, p2: {name:'Partenaire 2', emoji:'🐰'}, tasks:[], expenses:[], agenda:[] };
+    let activePartner = 1;
+
+    db.ref('deux_en_un_data').on('value', snap => { if(snap.val()) { state = snap.val(); renderUI(); } });
+
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById('sec-' + tab).classList.remove('hidden');
+      document.getElementById('tab-' + tab).classList.add('active');
+    }
+
+    function addTask() {
+      const i = document.getElementById('task-input');
+      if(!i.value.trim()) return;
+      state.tasks.push({text: i.value.trim()}); i.value='';
+      db.ref('deux_en_un_data').set(state);
+    }
+    function addExpense() {
+      const t = document.getElementById('expense-title').value, a = parseFloat(document.getElementById('expense-amount').value);
+      if(!t || !a) return;
+      state.expenses.push({title: t, amount: a}); 
+      db.ref('deux_en_un_data').set(state);
+    }
+    function addAgenda() {
+      const t = document.getElementById('agenda-title').value;
+      if(!t) return;
+      state.agenda.push({title: t});
+      db.ref('deux_en_un_data').set(state);
+    }
+    function spinWheel() {
+      const choices = ["Pizza 🍕", "Sushi 🍣", "Burger 🍔"];
+      document.getElementById('wheel-result').innerText = choices[Math.floor(Math.random() * choices.length)];
+      confetti({ particleCount: 20 });
+    }
+    function openAvatarModal(p) { activePartner = p; document.getElementById('avatar-modal').classList.replace('hidden', 'flex'); }
+    function saveAvatar() {
+      const n = document.getElementById('modal-name').value;
+      if(n) state['p' + activePartner].name = n;
+      document.getElementById('avatar-modal').classList.replace('flex', 'hidden');
+      db.ref('deux_en_un_data').set(state);
+    }
+    function renderUI() {
+      document.getElementById('p1-name').innerText = state.p1.name;
+      document.getElementById('p2-name').innerText = state.p2.name;
+      document.getElementById('task-list').innerHTML = (state.tasks||[]).map(t => `<li class="p-2 bg-gray-50 rounded-lg text-xs">${t.text}</li>`).join('');
+      document.getElementById('expense-list').innerHTML = (state.expenses||[]).map(e => `<li class="p-2 bg-emerald-50 rounded-lg text-xs flex justify-between"><span>${e.title}</span><b>${e.amount}€</b></li>`).join('');
+      document.getElementById('agenda-list').innerHTML = (state.agenda||[]).map(a => `<li class="p-2 bg-indigo-50 rounded-lg text-xs">📅 ${a.title}</li>`).join('');
+    }
+  </script>
+</body>
+</html>
