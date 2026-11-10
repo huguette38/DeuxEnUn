@@ -4,7 +4,7 @@
   "display": "standalone",
   "name": "Deux En Un",
   "orientation": "any",
-  "scope": "/",
+  "scope": "/DeuxEnUn/",
   "short_name": "Deux En Un",
   "start_url": "https://huguette38.github.io/DeuxEnUn/",
   "theme_color": "#ffffff"
