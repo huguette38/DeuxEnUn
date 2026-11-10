@@ -1,0 +1,11 @@
+{
+  "background_color": "#ffffff",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "Deux En Un",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "Deux En Un",
+  "start_url": "/DeuxEnUn/",
+  "theme_color": "#ffffff"
+}
